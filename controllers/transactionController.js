@@ -1,59 +1,77 @@
-const { createTransaction, getTransactions, deleteTransaction } = require("../models/transactionModel");
-
-
+const {
+    createTransaction,
+    getTransactions,
+    deleteTransaction
+} = require("../models/transactionModel");
 
 exports.addTransaction = (req, res) => {
+
     try {
 
-        const { category_id, amount, type, note, transaction_date } = req.body;
-
+        const {
+            category_id,
+            amount,
+            type,
+            note,
+            transaction_date
+        } = req.body;
 
         const userId = req.user.id;
 
+        createTransaction(
+            userId,
+            category_id,
+            amount,
+            type,
+            note,
+            transaction_date,
+            (err, result) => {
 
-        createTransaction(userId, category_id, amount, type, note, transaction_date, (err, result) => {
+                if (err) {
 
-            if (err) {
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
+                    console.log(err);
 
+                    return res.status(500).json({
+                        success: false,
+                        message: err.message
+                    });
+                }
+
+                res.status(201).json({
+                    success: true,
+                    message: "Transaction added successfully"
                 });
-
             }
-
-            res.status(201).json({
-                success: true,
-                message: "Transaction added"
-
-            });
-        });
+        );
 
     } catch (error) {
+
+        console.log(error);
+
         res.status(500).json({
             success: false,
             message: error.message
-
         });
-
     }
 };
 
-
-
-
 exports.fetchTransactions = (req, res) => {
+
     try {
+
         const userId = req.user.id;
 
         getTransactions(userId, (err, result) => {
+
             if (err) {
+
+                console.log(err);
+
                 return res.status(500).json({
                     success: false,
-                    message: error.message
+                    message: err.message
                 });
             }
-
 
             res.status(200).json({
                 success: true,
@@ -62,15 +80,15 @@ exports.fetchTransactions = (req, res) => {
         });
 
     } catch (error) {
+
+        console.log(error);
+
         res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
 };
-
-
 
 exports.removeTransaction = (req, res) => {
 
@@ -78,12 +96,14 @@ exports.removeTransaction = (req, res) => {
 
         const { id } = req.params;
 
-
         const userId = req.user.id;
 
         deleteTransaction(id, userId, (err, result) => {
 
             if (err) {
+
+                console.log(err);
+
                 return res.status(500).json({
                     success: false,
                     message: err.message
@@ -91,6 +111,7 @@ exports.removeTransaction = (req, res) => {
             }
 
             if (result.affectedRows === 0) {
+
                 return res.status(404).json({
                     success: false,
                     message: "Transaction not found"
@@ -101,10 +122,11 @@ exports.removeTransaction = (req, res) => {
                 success: true,
                 message: "Transaction deleted"
             });
-
         });
 
     } catch (error) {
+
+        console.log(error);
 
         res.status(500).json({
             success: false,
